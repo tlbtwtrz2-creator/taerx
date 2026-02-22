@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crypto Wallet</title>
+
+<style>
+body{margin:0;font-family:Arial;background:#0b0e11;color:#eaecef;}
+header{background:#181a20;padding:20px;text-align:center;font-size:22px;font-weight:bold;color:#fcd535;}
+.container{padding:20px;max-width:500px;margin:auto;}
+.card{background:#1e2329;padding:20px;border-radius:16px;margin-bottom:20px;border:1px solid #2b3139;}
+button{width:100%;padding:14px;border:none;border-radius:12px;margin-top:12px;cursor:pointer;font-size:15px;}
+.primary{background:#fcd535;color:black;font-weight:bold;}
+.danger{background:#ef4444;color:white;}
+.secondary{background:#2b3139;color:white;}
+.success{background:#16a34a;color:white;font-weight:bold;}
+.coin{display:flex;justify-content:space-between;align-items:center;padding:14px;background:#2b3139;border-radius:12px;margin-top:10px;cursor:pointer;}
+.coin img{width:26px;}
+.coin:hover{background:#3b4149;}
+.hidden{display:none;}
+.qr{text-align:center;margin-top:15px;}
+.qr img{width:190px;border-radius:14px;border:3px solid #fcd535;background:white;padding:6px;}
+input{width:100%;padding:14px;border-radius:12px;border:1px solid #2b3139;margin-top:12px;background:#2b3139;color:white;}
+.note{font-size:13px;color:#9ca3af;margin-top:6px;}
+.loader{
+border:4px solid #2b3139;
+border-top:4px solid #16a34a;
+border-radius:50%;
+width:30px;
+height:30px;
+animation:spin 1s linear infinite;
+margin:15px auto;
+}
+@keyframes spin{
+0%{transform:rotate(0deg);}
+100%{transform:rotate(360deg);}
+}
+</style>
+</head>
+
+<body>
+
+<header>Crypto Wallet</header>
+
+<div class="container">
+
+<!-- الصفحة الرئيسية -->
+<div id="home" class="card">
+<button class="primary" onclick="openDeposit()">إيداع</button>
+<button class="danger" onclick="openWithdraw()">سحب</button>
+</div>
+
+<!-- الإيداع -->
+<div id="depositPage" class="hidden">
+<div class="card">
+<h3>اختر شبكة الإيداع</h3>
+
+<div class="coin" onclick="showDeposit('USDT - TRC20','TDKiiVtTUXgq27DZvGFWrtHJvoCphh8WwD')">
+<span>USDT - TRC20</span>
+<img src="https://cryptologos.cc/logos/tether-usdt-logo.png">
+</div>
+
+<div class="coin" onclick="showDeposit('USDT - ERC20','0x4428018a7f868e9d7ce2f51ddb17ff946fbce7cd')">
+<span>USDT - ERC20</span>
+<img src="https://cryptologos.cc/logos/tether-usdt-logo.png">
+</div>
+
+<div class="coin" onclick="showDeposit('USDC - ERC20','0x4428018a7f868e9d7ce2f51ddb17ff946fbce7cd')">
+<span>USDC - ERC20</span>
+<img src="https://cryptologos.cc/logos/usd-coin-usdc-logo.png">
+</div>
+
+<div class="coin" onclick="showDeposit('Bitcoin','3JZJ6z43mSZbJsik7LqSRq3zgC4jruUwEx')">
+<span>Bitcoin</span>
+<img src="https://cryptologos.cc/logos/bitcoin-btc-logo.png">
+</div>
+
+<div class="coin" onclick="showDeposit('TRON','TQKGfXBZipcBULB2j25cjiLX6sCmniCxun')">
+<span>TRON</span>
+<img src="https://cryptologos.cc/logos/tron-trx-logo.png">
+</div>
+
+<button class="secondary" onclick="goHome()">رجوع</button>
+</div>
+</div>
+
+<!-- تفاصيل الإيداع -->
+<div id="depositDetails" class="hidden">
+<div class="card">
+<h3 id="depositTitle"></h3>
+
+<div class="qr">
+<img id="qrImage">
+</div>
+
+<input type="text" id="depositAddress" readonly>
+
+<input type="number" placeholder="أدخل مبلغ الإيداع بالدولار">
+
+<div class="note">
+عند إتمام الإيداع اضغط على تحقق
+</div>
+
+<button class="primary" onclick="copyAddress()">نسخ العنوان</button>
+
+<button id="verifyBtn" class="success" onclick="verifyDeposit()">
+تحقق
+</button>
+
+<div id="loadingArea"></div>
+
+<button class="secondary" onclick="backDeposit()">رجوع</button>
+</div>
+</div>
+
+<!-- قائمة السحب -->
+<div id="withdrawList" class="hidden">
+<div class="card">
+<h3 style="color:#ef4444;">اختر شبكة السحب</h3>
+
+<div class="coin" onclick="openWithdrawForm('USDT - TRC20')"><span>USDT - TRC20</span><img src="https://cryptologos.cc/logos/tether-usdt-logo.png"></div>
+<div class="coin" onclick="openWithdrawForm('USDT - ERC20')"><span>USDT - ERC20</span><img src="https://cryptologos.cc/logos/tether-usdt-logo.png"></div>
+<div class="coin" onclick="openWithdrawForm('USDC - ERC20')"><span>USDC - ERC20</span><img src="https://cryptologos.cc/logos/usd-coin-usdc-logo.png"></div>
+<div class="coin" onclick="openWithdrawForm('Bitcoin')"><span>Bitcoin</span><img src="https://cryptologos.cc/logos/bitcoin-btc-logo.png"></div>
+<div class="coin" onclick="openWithdrawForm('TRON')"><span>TRON</span><img src="https://cryptologos.cc/logos/tron-trx-logo.png"></div>
+
+<button class="secondary" onclick="goHome()">رجوع</button>
+</div>
+</div>
+
+<!-- نموذج السحب -->
+<div id="withdrawForm" class="hidden">
+<div class="card">
+<h3 id="withdrawTitle"></h3>
+<input type="text" placeholder="أدخل عنوان محفظتك">
+<input type="number" id="withdrawAmount" placeholder="أدخل مبلغ السحب">
+<div class="note">الحد الأدنى للسحب 10 دولار</div>
+<button class="danger" onclick="submitWithdraw()">إرسال طلب السحب</button>
+<button class="secondary" onclick="backWithdraw()">رجوع</button>
+</div>
+</div>
+
+</div>
+
+<script>
+
+function hideAll(){
+["home","depositPage","depositDetails","withdrawList","withdrawForm"]
+.forEach(id=>document.getElementById(id).classList.add("hidden"));
+}
+
+function goHome(){hideAll();document.getElementById("home").classList.remove("hidden");}
+function openDeposit(){hideAll();document.getElementById("depositPage").classList.remove("hidden");}
+function backDeposit(){openDeposit();}
+function openWithdraw(){hideAll();document.getElementById("withdrawList").classList.remove("hidden");}
+function backWithdraw(){openWithdraw();}
+
+function showDeposit(title,address){
+hideAll();
+document.getElementById("depositDetails").classList.remove("hidden");
+document.getElementById("depositTitle").innerText="إيداع عبر "+title;
+document.getElementById("depositAddress").value=address;
+document.getElementById("qrImage").src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data="+address;
+}
+
+function copyAddress(){
+let copyText=document.getElementById("depositAddress");
+copyText.select();
+document.execCommand("copy");
+alert("تم نسخ العنوان");
+}
+
+function verifyDeposit(){
+document.getElementById("verifyBtn").disabled=true;
+document.getElementById("loadingArea").innerHTML='<div class="loader"></div>';
+
+setTimeout(function(){
+document.getElementById("loadingArea").innerHTML="";
+alert("تم إرسال طلب التحقق للمراجعة");
+document.getElementById("verifyBtn").disabled=false;
+},3000);
+}
+
+function openWithdrawForm(title){
+hideAll();
+document.getElementById("withdrawForm").classList.remove("hidden");
+document.getElementById("withdrawTitle").innerText="سحب عبر "+title;
+}
+
+function submitWithdraw(){
+let amount=parseFloat(document.getElementById("withdrawAmount").value);
+if(!amount||amount<=0){alert("أدخل مبلغ صحيح");return;}
+if(amount<10){alert("أقل عملية سحب هي 10 دولار");return;}
+alert("تم إرسال طلب السحب للمراجعة");
+goHome();
+}
+
+</script>
+
+</body>
+</html>
