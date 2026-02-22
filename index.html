@@ -13,49 +13,35 @@ body{
     display:flex;
     justify-content:center;
     align-items:center;
-    min-height:100vh;
+    height:100vh;
 }
 
 .container{
     background:white;
-    width:400px;
-    padding:35px;
-    border-radius:20px;
-    box-shadow:0 20px 40px rgba(0,0,0,0.3);
+    width:350px;
+    padding:30px;
+    border-radius:15px;
+    box-shadow:0 15px 30px rgba(0,0,0,0.3);
 }
 
 h2{
     text-align:center;
     margin-bottom:20px;
-    color:#333;
 }
 
-.input-group{
-    margin-bottom:15px;
-    text-align:right;
-}
-
-.input-group label{
-    font-size:14px;
-    color:#555;
-}
-
-.input-group input,
-.input-group select{
+input{
     width:100%;
     padding:10px;
-    margin-top:5px;
-    border-radius:10px;
+    margin:8px 0;
+    border-radius:8px;
     border:1px solid #ccc;
-    outline:none;
 }
 
 button{
     width:100%;
-    padding:12px;
-    margin-top:10px;
+    padding:10px;
     border:none;
-    border-radius:10px;
+    border-radius:8px;
     background:#243b55;
     color:white;
     font-size:16px;
@@ -66,16 +52,11 @@ button:hover{
     background:#141e30;
 }
 
-.footer{
+.link{
     text-align:center;
-    margin-top:15px;
-    font-size:14px;
-}
-
-.footer a{
+    margin-top:10px;
     cursor:pointer;
     color:#243b55;
-    text-decoration:none;
     font-weight:bold;
 }
 
@@ -89,84 +70,56 @@ button:hover{
 
 <div class="container">
 
-    <!-- تسجيل الدخول -->
-    <div id="loginForm">
-        <h2>تسجيل الدخول</h2>
+<!-- تسجيل الدخول -->
+<div id="loginBox">
+    <h2>تسجيل الدخول</h2>
+    <input type="email" id="loginEmail" placeholder="البريد الإلكتروني">
+    <input type="password" id="loginPassword" placeholder="كلمة المرور">
+    <button onclick="login()">دخول</button>
+    <div class="link" onclick="showRegister()">إنشاء حساب</div>
+</div>
 
-        <div class="input-group">
-            <label>البريد الإلكتروني</label>
-            <input type="email" id="loginEmail">
-        </div>
-
-        <div class="input-group">
-            <label>كلمة المرور</label>
-            <input type="password" id="loginPassword">
-        </div>
-
-        <button onclick="login()">دخول</button>
-
-        <div class="footer">
-            ليس لديك حساب؟ 
-            <a onclick="showRegister()">إنشاء حساب</a>
-        </div>
-    </div>
-
-
-    <!-- إنشاء حساب -->
-    <div id="registerForm" class="hidden">
-        <h2>إنشاء حساب جديد</h2>
-
-        <div class="input-group">
-            <label>الاسم الكامل</label>
-            <input type="text" id="name">
-        </div>
-
-        <div class="input-group">
-            <label>البريد الإلكتروني</label>
-            <input type="email" id="email">
-        </div>
-
-        <div class="input-group">
-            <label>كلمة المرور</label>
-            <input type="password" id="password">
-        </div>
-
-        <div class="input-group">
-            <label>تأكيد كلمة المرور</label>
-            <input type="password" id="confirmPassword">
-        </div>
-
-        <button onclick="register()">إنشاء حساب</button>
-
-        <div class="footer">
-            لديك حساب؟ 
-            <a onclick="showLogin()">تسجيل الدخول</a>
-        </div>
-    </div>
+<!-- إنشاء حساب -->
+<div id="registerBox" class="hidden">
+    <h2>إنشاء حساب</h2>
+    <input type="email" id="regEmail" placeholder="البريد الإلكتروني">
+    <input type="password" id="regPassword" placeholder="كلمة المرور">
+    <input type="password" id="regConfirm" placeholder="تأكيد كلمة المرور">
+    <button onclick="register()">إنشاء</button>
+    <div class="link" onclick="showLogin()">رجوع لتسجيل الدخول</div>
+</div>
 
 </div>
 
 <script>
+
 function showRegister(){
-    document.getElementById("loginForm").classList.add("hidden");
-    document.getElementById("registerForm").classList.remove("hidden");
+    document.getElementById("loginBox").classList.add("hidden");
+    document.getElementById("registerBox").classList.remove("hidden");
 }
 
 function showLogin(){
-    document.getElementById("registerForm").classList.add("hidden");
-    document.getElementById("loginForm").classList.remove("hidden");
+    document.getElementById("registerBox").classList.add("hidden");
+    document.getElementById("loginBox").classList.remove("hidden");
 }
 
 function register(){
-    let name = document.getElementById("name").value;
-    let email = document.getElementById("email").value;
-    let password = document.getElementById("password").value;
-    let confirm = document.getElementById("confirmPassword").value;
+    let email = document.getElementById("regEmail").value;
+    let password = document.getElementById("regPassword").value;
+    let confirm = document.getElementById("regConfirm").value;
 
     if(password !== confirm){
         alert("كلمة المرور غير متطابقة");
         return;
     }
+
+    localStorage.setItem("userEmail", email);
+    localStorage.setItem("userPassword", password);
+
+    alert("تم إنشاء الحساب بنجاح");
+    showLogin();
+}
+
 function login(){
     let email = document.getElementById("loginEmail").value;
     let password = document.getElementById("loginPassword").value;
@@ -177,18 +130,12 @@ function login(){
     if(email === savedEmail && password === savedPassword){
         localStorage.setItem("isLoggedIn","true");
         window.location.href = "dashboard.html";
-    } else {
-        alert("بيانات غير صحيحة");
-    }
-    
-    if(email === savedEmail && password === savedPassword){
-    localStorage.setIte
-}
+    }else{
         alert("بيانات غير صحيحة");
     }
 }
+
 </script>
 
 </body>
-
 </html>
