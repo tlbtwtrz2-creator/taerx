@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TAERK</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif}
+body{
+min-height:100vh;background:#060a16;
+display:flex;justify-content:center;align-items:center;
+padding:20px;color:#fff}
+.container{width:100%;max-width:430px}
+
+/* RGB Snake */
+.card-wrapper{
+padding:3px;border-radius:32px;
+background:linear-gradient(90deg,red,orange,yellow,green,cyan,blue,violet,red);
+background-size:400%;
+animation:snake 45s linear infinite}
+@keyframes snake{
+0%{background-position:0% 50%}
+100%{background-position:400% 50%}
+}
+
+.card{
+background:linear-gradient(145deg,#0f172a,#111827);
+border-radius:30px;padding:40px 28px}
+
+/* FIRE LOGO */
+.brand{
+text-align:center;font-size:46px;font-weight:900;
+letter-spacing:6px;margin-bottom:25px;color:#ffae00;
+text-shadow:0 0 10px #ff6a00,0 0 25px #ff0000;
+animation:fire 1.6s infinite alternate}
+@keyframes fire{
+from{text-shadow:0 0 10px #ff6a00,0 0 20px #ff0000}
+to{text-shadow:0 0 30px #ffae00,0 0 60px #ff0000}
+}
+
+.tabs{display:flex;background:#1f2937;border-radius:16px;margin-bottom:20px;overflow:hidden}
+.tab{flex:1;text-align:center;padding:12px;cursor:pointer;font-size:14px;color:#9ca3af}
+.tab.active{background:linear-gradient(90deg,#7c3aed,#3b82f6);color:white}
+
+.input-group{margin-bottom:14px;position:relative}
+.input{
+width:100%;padding:12px 45px 12px 12px;border-radius:14px;
+border:1px solid #374151;background:#0f172a;color:#fff;font-size:14px;outline:none}
+
+.eye{position:absolute;left:10px;top:50%;transform:translateY(-50%);
+width:20px;height:20px;cursor:pointer}
+.eye path{fill:#aaa}
+.eye:hover path{fill:#fff}
+.slash{stroke:#ff4444;stroke-width:2;stroke-linecap:round;display:block}
+
+/* Country */
+.country-wrapper{position:relative;margin-bottom:12px}
+.country-selected{
+background:#0f172a;border:1px solid #374151;
+padding:12px;border-radius:14px;cursor:pointer;
+display:flex;justify-content:space-between;align-items:center}
+
+#arrow{transition:.3s;color:#9ca3af}
+#arrow.active{
+color:#3b82f6;text-shadow:0 0 8px #3b82f6,0 0 15px #7c3aed}
+
+.country-list{
+position:absolute;top:110%;right:0;width:100%;
+background:#1f2937;border-radius:14px;
+max-height:0;overflow:hidden;opacity:0;
+transform:translateY(-10px);transition:.35s ease;z-index:1000}
+
+.country-list.open{
+max-height:240px;opacity:1;transform:translateY(0);overflow-y:auto}
+
+.country-search{
+padding:8px;border:none;width:100%;
+background:#111827;color:white;outline:none}
+
+.country-item{
+padding:8px;cursor:pointer;border-bottom:1px solid #374151}
+.country-item:hover{background:#374151}
+
+/* Strength */
+.strength{display:flex;justify-content:center;gap:10px;margin-top:6px}
+.bar{width:30px;height:3px;border-radius:4px;background:#333;transition:.3s}
+
+.button{
+width:100%;padding:12px;border:none;border-radius:14px;
+background:linear-gradient(90deg,#7c3aed,#3b82f6);
+color:white;font-weight:600;cursor:pointer;margin-top:6px}
+
+.error{color:#ff4d4d;font-size:12px;display:none;margin-top:4px}
+#registerBox{display:none}
+</style>
+</head>
+<body>
+
+<div class="container">
+<div class="card-wrapper">
+<div class="card">
+
+<div class="brand">TAERK</div>
+
+<div class="tabs">
+<div class="tab active" onclick="switchTab('login')">تسجيل الدخول</div>
+<div class="tab" onclick="switchTab('register')">إنشاء حساب</div>
+</div>
+
+<!-- LOGIN -->
+<div id="loginBox">
+<div class="input-group">
+<input type="email" class="input" id="loginEmail" placeholder="البريد الإلكتروني">
+<div class="error" id="loginError">بيانات غير صحيحة</div>
+</div>
+
+<div class="input-group">
+<input type="password" class="input" id="loginPass" placeholder="كلمة المرور">
+<svg class="eye" onclick="togglePass('loginPass','slashLogin')" viewBox="0 0 24 24">
+<path d="M12 5c-7 0-10 7-10 7s3 7 10 7 10-7 10-7-3-7-10-7zm0 11a4 4 0 1 1 0-8 4 4 0 0 1 0 8z"/>
+<line id="slashLogin" class="slash" x1="4" y1="20" x2="20" y2="4"/>
+</svg>
+</div>
+<button class="button" onclick="login()">دخول</button>
+</div>
+
+<!-- REGISTER -->
+<div id="registerBox">
+
+<div class="country-wrapper">
+<div class="country-selected" onclick="toggleCountry()">
+<span id="selectedCountry">🇸🇦 السعودية</span>
+<span id="arrow">▼</span>
+</div>
+
+<div class="country-list" id="countryList">
+<input type="text" class="country-search" placeholder="بحث..." onkeyup="searchCountry(this.value)">
+<div id="countryItems"></div>
+</div>
+</div>
+
+<div class="input-group">
+<input type="email" class="input" id="regEmail" placeholder="البريد الإلكتروني">
+</div>
+
+<div class="input-group">
+<input type="password" class="input" id="regPass" placeholder="كلمة المرور" oninput="checkStrength()">
+<svg class="eye" onclick="togglePass('regPass','slashReg')" viewBox="0 0 24 24">
+<path d="M12 5c-7 0-10 7-10 7s3 7 10 7 10-7 10-7-3-7-10-7zm0 11a4 4 0 1 1 0-8 4 4 0 0 1 0 8z"/>
+<line id="slashReg" class="slash" x1="4" y1="20" x2="20" y2="4"/>
+</svg>
+
+<div class="strength">
+<div class="bar" id="bar1"></div>
+<div class="bar" id="bar2"></div>
+<div class="bar" id="bar3"></div>
+</div>
+</div>
+
+<div class="input-group">
+<input type="password" class="input" id="confirmPass" placeholder="تأكيد كلمة المرور">
+<svg class="eye" onclick="togglePass('confirmPass','slashConfirm')" viewBox="0 0 24 24">
+<path d="M12 5c-7 0-10 7-10 7s3 7 10 7 10-7 10-7-3-7-10-7zm0 11a4 4 0 1 1 0-8 4 4 0 0 1 0 8z"/>
+<line id="slashConfirm" class="slash" x1="4" y1="20" x2="20" y2="4"/>
+</svg>
+<div class="error" id="matchError">كلمة المرور غير متطابقة</div>
+</div>
+
+<button class="button" onclick="createAccount()">إنشاء حساب</button>
+</div>
+
+</div>
+</div>
+</div>
+
+<script>
+
+/* Tabs */
+function switchTab(tab){
+document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+if(tab==="login"){document.querySelectorAll('.tab')[0].classList.add('active');
+loginBox.style.display="block";registerBox.style.display="none"}
+else{document.querySelectorAll('.tab')[1].classList.add('active');
+loginBox.style.display="none";registerBox.style.display="block"}}
+
+/* Eye */
+function togglePass(id,slashId){
+let input=document.getElementById(id);
+let slash=document.getElementById(slashId);
+if(input.type==="password"){input.type="text";slash.style.display="none"}
+else{input.type="password";slash.style.display="block"}}
+
+/* Countries 80+ */
+const countries=[
+"🇸🇦 السعودية","🇦🇪 الإمارات","🇶🇦 قطر","🇰🇼 الكويت","🇧🇭 البحرين","🇴🇲 عمان",
+"🇮🇶 العراق","🇯🇴 الأردن","🇱🇧 لبنان","🇸🇾 سوريا","🇪🇬 مصر","🇲🇦 المغرب",
+"🇩🇿 الجزائر","🇹🇳 تونس","🇱🇾 ليبيا","🇸🇩 السودان","🇾🇪 اليمن",
+"🇹🇷 تركيا","🇮🇷 إيران","🇵🇰 باكستان","🇮🇳 الهند","🇨🇳 الصين","🇯🇵 اليابان",
+"🇰🇷 كوريا الجنوبية","🇲🇾 ماليزيا","🇮🇩 إندونيسيا","🇹🇭 تايلند","🇻🇳 فيتنام",
+"🇵🇭 الفلبين","🇸🇬 سنغافورة","🇳🇵 نيبال","🇱🇰 سريلانكا",
+"🇩🇪 ألمانيا","🇫🇷 فرنسا","🇮🇹 إيطاليا","🇪🇸 إسبانيا","🇬🇧 المملكة المتحدة",
+"🇳🇱 هولندا","🇧🇪 بلجيكا","🇨🇭 سويسرا","🇦🇹 النمسا","🇸🇪 السويد",
+"🇳🇴 النرويج","🇩🇰 الدنمارك","🇫🇮 فنلندا","🇵🇱 بولندا","🇷🇺 روسيا",
+"🇺🇦 أوكرانيا","🇺🇸 الولايات المتحدة","🇨🇦 كندا","🇲🇽 المكسيك",
+"🇧🇷 البرازيل","🇦🇷 الأرجنتين","🇨🇱 تشيلي","🇨🇴 كولومبيا","🇵🇪 بيرو",
+"🇦🇺 أستراليا","🇳🇿 نيوزيلندا","🇿🇦 جنوب أفريقيا","🇳🇬 نيجيريا",
+"🇰🇪 كينيا","🇬🇭 غانا","🇪🇹 إثيوبيا","🇹🇿 تنزانيا","🇸🇳 السنغال",
+"🇰🇿 كازاخستان","🇦🇿 أذربيجان","🇬🇪 جورجيا","🇮🇪 أيرلندا","🇵🇹 البرتغال",
+"🇧🇬 بلغاريا","🇭🇷 كرواتيا","🇸🇰 سلوفاكيا","🇸🇮 سلوفينيا"
+];
+
+function renderCountries(list){
+countryItems.innerHTML="";
+list.forEach(c=>{
+let div=document.createElement("div");
+div.className="country-item";
+div.innerText=c;
+div.onclick=function(){
+selectedCountry.innerText=c;closeCountry()}
+countryItems.appendChild(div)})
+}
+renderCountries(countries);
+
+function toggleCountry(){
+countryList.classList.toggle("open");
+arrow.classList.toggle("active");
+arrow.style.transform=countryList.classList.contains("open")?"rotate(180deg)":"rotate(0deg)"}
+
+function closeCountry(){
+countryList.classList.remove("open");
+arrow.classList.remove("active");
+arrow.style.transform="rotate(0deg)"}
+
+document.addEventListener("click",function(e){
+if(!document.querySelector(".country-wrapper").contains(e.target)){closeCountry()}});
+
+function searchCountry(val){
+let filtered=countries.filter(c=>c.includes(val));
+renderCountries(filtered)}
+
+/* Strength */
+function checkStrength(){
+let pass=regPass.value;let s=0;
+if(pass.length>=8)s++;
+if(/[A-Z]/.test(pass))s++;
+if(/[0-9]/.test(pass))s++;
+document.querySelectorAll(".bar").forEach(b=>b.style.background="#333");
+if(s==1)bar1.style.background="red";
+else if(s==2){bar1.style.background="orange";bar2.style.background="orange"}
+else if(s==3){bar1.style.background="lime";bar2.style.background="lime";bar3.style.background="lime"}}
+
+/* Register */
+function createAccount(){
+let email=regEmail.value.trim();
+let pass=regPass.value;
+let confirm=confirmPass.value;
+let pattern=/^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+if(!pattern.test(email)){alert("أدخل Gmail صحيح");return}
+if(pass.length<8||!/^[\s\S]*[A-Z][\s\S]*$/.test(pass)||!/[0-9]/.test(pass)){
+alert("كلمة المرور غير قوية");return}
+if(pass!==confirm){matchError.style.display="block";return}
+matchError.style.display="none";
+localStorage.setItem("userEmail",email);
+localStorage.setItem("userPass",pass);
+loginEmail.value=email;
+switchTab("login");
+alert("تم إنشاء الحساب بنجاح 👑")}
+
+/* Login */
+function login(){
+if(loginEmail.value===localStorage.getItem("userEmail") &&
+loginPass.value===localStorage.getItem("userPass")){
+alert("تم تسجيل الدخول 👑")}
+else{loginError.style.display="block"}}
+
+</script>
+</body>
+</html>
